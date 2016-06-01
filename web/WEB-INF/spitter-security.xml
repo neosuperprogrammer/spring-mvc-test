@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- Automatically registers a login form, BASIC authentication, anonymous 
+		authentication, logout services, remember-me and servlet-api-integration. -->
+	<security:http auto-config="true" use-expressions="true">
+		<security:form-login login-page="/login"
+			login-processing-url="/static/j_spring_security_check"
+			authentication-failure-url="/login" />
+		<security:logout logout-url="/static/j_spring_security_logout" />
+		<security:intercept-url pattern="/favicon.ico"
+			access="permitAll" />
+		<security:intercept-url pattern="/home"
+			access="hasRole('ROLE_SPITTER')" />
+		<security:intercept-url pattern="/admin/**"
+			access="isAuthenticated() and principal.username=='habuma'" />
+		<security:intercept-url pattern="/spitter/form"
+			requires-channel="https" />
+
+		<security:remember-me key="spitterKey"
+			token-validity-seconds="2419200" />
+
+	</security:http>
+
+	<!--<start id="authentication_manager"/> -->
+	<security:authentication-manager alias="authenticationManager">
+		<security:authentication-provider
+			user-service-ref="userService" />
+	</security:authentication-manager>
+	<!--<end id="authentication_manager"/> -->
+
+	<!-- ...or spitter-security-ldap.xml, or spitter-security-inmemory.xml -->
+	<import resource="spitter-security-inmemory.xml" />
+
+	<!--<start id="globalMethodSecurity_securedAnnotations"/> -->
+	<security:global-method-security
+		secured-annotations="enabled" />
+	<!--<end id="globalMethodSecurity_securedAnnotations"/> -->
+
+</beans>
